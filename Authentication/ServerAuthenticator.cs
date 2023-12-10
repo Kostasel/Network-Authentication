@@ -105,11 +105,11 @@ namespace NetworkAuth.ServerAuth
         /// <summary>
         /// Received on server when a client sends the HandshakeRequest broadcast message.
         /// </summary>
-        /// <see cref="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange"/>
+        /// <see cref="https://en.wikipedia.org/wiki/Diffie-Hellman_key_exchange"/>
         /// <param name="conn">Connection sending broadcast.</param>
         /// <param name="hsk">The Public key of the client in order to compute a common key.</param>
         /// 
-        private void OnHandshakeRequestBroadcast(NetworkConnection conn, HandshakeRequestBroadcast hsk)
+        private void OnHandshakeRequestBroadcast(NetworkConnection conn, HandshakeRequestBroadcast hsk, Channel channel)
         {
             NetworkManager.Log("Received Handshake request from client...");
             Span<byte> result = stackalloc byte[64 + 16];
@@ -141,7 +141,7 @@ namespace NetworkAuth.ServerAuth
         /// </summary>
         /// <param name="conn">Connection sending broadcast.</param>
         /// <param name="arb">The client login details for authentication.</param>
-        private void OnAuthenticationRequestBroadcast(NetworkConnection conn, AuthenticationRequestBroadcast arb)
+        private void OnAuthenticationRequestBroadcast(NetworkConnection conn, AuthenticationRequestBroadcast arb, Channel channel)
         {
             //We can't begin an authentication session if the client and server haven't agreed
             //on a SharedKey key for the encryption of the transmited data.

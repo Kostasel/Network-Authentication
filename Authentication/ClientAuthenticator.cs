@@ -88,7 +88,7 @@ namespace NetworkAuth.ClientAuth
         /// <see cref="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange"/>
         /// </summary>
         /// <param name="hsk"></param>
-        private void OnHandshakeResponseBroadcast(HandshakeResponseBroadcast hsk)
+        private void OnHandshakeResponseBroadcast(HandshakeResponseBroadcast hsk, Channel channel)
         {
             InstanceFinder.NetworkManager.Log("Received handshake response from server...");
             //Split the random bytes from the iv
@@ -117,8 +117,8 @@ namespace NetworkAuth.ClientAuth
         /// <summary>
         /// Received on client after server sends an authentication response.
         /// </summary>
-        /// <param name="rb"></param>
-        private void OnAuthenticationResponseBroadcast(AuthenticationResponseBroadcast arb)
+        /// <param name="arb"></param>
+        private void OnAuthenticationResponseBroadcast(AuthenticationResponseBroadcast arb, Channel channel)
         {
             InstanceFinder.NetworkManager.Log("Received authentication response from server...");
             bool result = arb.Authenticated;
