@@ -28,7 +28,7 @@ namespace NetworkAuth.scramble
 
         //Scramble(Transform) outgoing data.
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        public override ArraySegment<byte> HandleOutoing(ArraySegment<byte> src, bool toServer)
+        public override ArraySegment<byte> HandleOutgoing(ArraySegment<byte> src, bool toServer)
         {
             Span<byte> outgoing = new(src.Array, src.Offset, src.Count);
 
