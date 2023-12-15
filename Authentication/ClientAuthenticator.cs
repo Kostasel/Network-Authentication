@@ -50,10 +50,10 @@ namespace NetworkAuth.ClientAuth
             if (args.ConnectionState == LocalConnectionState.Started)
             {
                 if (AuthenticationCompleted) return;
-                //Listen to response from server.
+                //Listen to Handshake response from server.
                 InstanceFinder.ClientManager.RegisterBroadcast<HandshakeResponseBroadcast>(OnHandshakeResponseBroadcast);
                 InstanceFinder.NetworkManager.Log("Listening for Handshake response...");
-                //Listen to response from server.
+                //Listen to Authentication response from server.
                 InstanceFinder.ClientManager.RegisterBroadcast<AuthenticationResponseBroadcast>(OnAuthenticationResponseBroadcast);
                 InstanceFinder.NetworkManager.Log("Listening for Authentication response...");
                 //Using static parameters for P and G of Diffie-Hellman algoritm.
@@ -98,7 +98,7 @@ namespace NetworkAuth.ClientAuth
             //Use the public key received to compute the SharedKey key.
             InstanceFinder.NetworkManager.Log("Computing the SharedKey key based on the public key received from server...");
             crypto.ComputeSharedKey(Transforms.InvertTransformValueArray(hsk.PublicKey).ToArray(), rndbytes.ToArray());
-            //Set the iv received from server form the handshake so the server/client can decrypt each other.
+            //Set the iv received from server(in the handshake broadcast) so the server/client can decrypt each other.
             crypto.iv = iv.ToArray();
             if (crypto.PublicKey.Length > 0 && crypto.GetSharedKey().Length > 0)
             {
