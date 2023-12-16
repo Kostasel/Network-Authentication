@@ -22,7 +22,7 @@ namespace NetworkAuth.Crypto
             x = new BigInteger(data.GetRandomPrimeX());
             g = ComputePrimeRoot(p);
             _public = BigInteger.ModPow(g, x, p);
-            _p = data.GetRandomPrimeIndex();
+            _p = data.GetRandomPrime();
             _g = g;
         }
 
@@ -30,7 +30,7 @@ namespace NetworkAuth.Crypto
         public KeyGenerator(int P, int G)
         {
             CryptoTransforms data = new CryptoTransforms();
-            p = new BigInteger(data.GetRandomPrime(P));
+            p = new BigInteger(data.GetPrimeP(P));
             x = new BigInteger(data.GetRandomPrimeX());
             g = G;
             _public = BigInteger.ModPow(g, x, p);
@@ -40,8 +40,8 @@ namespace NetworkAuth.Crypto
         internal KeyGenerator(int P, int G, int X)
         {
             CryptoTransforms data = new CryptoTransforms();
-            p = new BigInteger(data.GetRandomPrime(P));
-            x = new BigInteger(data.GetRandomPrimeX(X));
+            p = new BigInteger(data.GetPrimeP(P));
+            x = new BigInteger(data.GetPrimeX(X));
             g = G;
             _public = BigInteger.ModPow(g, x, p);
         }
