@@ -107,9 +107,9 @@ namespace NetworkEncrypted.EncryptedChannelClient
                 }
                 case LocalConnectionState.Stopped:
                     networkManager.Log("Stopped listening for responses from server...");
-                    //Stop Listening to response from server.
+                    //Stop listening to handshake response from server.
                     clientManager.UnregisterBroadcast<HandshakeResponseBroadcast>(OnHandshakeResponseBroadcast);
-                    //Stop Listening to response from server.
+                    //Stop listening to message response from server.
                     clientManager.UnregisterBroadcast<ResponseToEncryptedMsgBroadcast>(OnEncryptedMsgResponseBroadcast);
                     _crypto?.Dispose(true);
                     networkManager.Log("EncryptedChannelClient Stopped.");
