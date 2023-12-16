@@ -32,7 +32,7 @@ namespace NetworkEncrypted
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal int GetRandomPrime()
         {
-            return rnd.Next(1, 12);
+            return rnd.Next(6, 12);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal int GetRandomPrimeX()
@@ -41,13 +41,13 @@ namespace NetworkEncrypted
         }
         internal void RandomizePrimes()
         {
-            selected = rnd.Next(1, 12);
+            selected = rnd.Next(6, 12);
             selectedX = rnd.Next(0, 5);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal byte[] GetPrimeP(int idx)
         {
-            return InternalGetPrime(idx);
+            return InternalGetPrimeP(idx);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal byte[] GetPrimeX(int idx)
@@ -56,7 +56,7 @@ namespace NetworkEncrypted
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private byte[] InternalGetPrime(int idx)
+        private byte[] InternalGetPrimeP(int idx)
         {
             if (selected == 6)
             {
