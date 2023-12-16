@@ -1,17 +1,16 @@
 //Copyright 2023 Kostasel
 //See license.txt for license details
 
-using FishNet;
-using FishNet.Managing;
-using FishNet.Transporting;
-using NetworkAuth.Crypto;
 using System;
 using System.Text;
+using FishNet;
+using FishNet.Managing;
 using FishNet.Managing.Client;
-using NetworkAuth.ServerAuth;
+using FishNet.Transporting;
+using NetworkEncrypted.Crypto;
 using UnityEngine;
 
-namespace NetworkEncrypted.EncryptedChannelClient
+namespace NetworkEncrypted
 {
     [DisallowMultipleComponent]
     public class EncryptedChannelClient : MonoBehaviour

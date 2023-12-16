@@ -8,10 +8,10 @@ using FishNet;
 using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Transporting;
-using NetworkAuth.Crypto;
+using NetworkEncrypted.Crypto;
 using UnityEngine;
 
-namespace NetworkEncrypted.EncryptedChannelServer
+namespace NetworkEncrypted
 {
     [DisallowMultipleComponent]
     public class EncryptedChannelServer : MonoBehaviour

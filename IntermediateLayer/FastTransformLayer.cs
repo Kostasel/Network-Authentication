@@ -3,8 +3,9 @@
 
 using FishNet.Managing.Transporting;
 using System;
+using NetworkEncrypted;
 
-namespace NetworkAuth.scramble
+namespace NetworkEncrypted.Scramble
 {
     /// <summary>
     /// Performant & Lightweight to scramble the outgoing server data and unscramble the incoming.

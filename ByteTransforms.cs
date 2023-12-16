@@ -3,7 +3,7 @@
 
 using System;
 
-namespace NetworkAuth
+namespace NetworkEncrypted
 {
     internal readonly ref struct Transforms
     {
