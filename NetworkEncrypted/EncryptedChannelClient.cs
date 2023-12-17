@@ -17,7 +17,8 @@ namespace NetworkEncrypted
     {
         #region Public
 
-        /// Subscribe, if you need to know the handshake state (e.g. to show an error to the user).
+        /// Subscribe, if you need to know when you can start sending encrypted messaged.
+        /// When false, show errors to the user, as it means that the encrypted channel setup failed.
         /// True - completed successfully, false - completed with an error.
         public event Action<bool> OnHandshakeCompleted
         {
@@ -28,6 +29,9 @@ namespace NetworkEncrypted
             }
             remove => _handshakeCompletedDelegate -= value;
         }
+
+        /// Subscribe to listen to all responses to encrypted requests you've sent. 
+        public event Action<string> OnResponseToEncryptedMessage;
 
         #endregion
 
@@ -43,7 +47,7 @@ namespace NetworkEncrypted
         /// <summary>
         /// Call this from the client, when you want to send a message securely.
         /// </summary>
-        public void SendEncryptedMessage(string message, Action<string> onResponseFromServer)
+        public void SendEncryptedMessage(string message)
         {
             NetworkManager networkManager = InstanceFinder.NetworkManager;
             if (!_handshakeCompleted)
@@ -52,17 +56,16 @@ namespace NetworkEncrypted
                 return;
             }
 
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             //16 = aes encryption block size, so we increase in 16 bytes increments based on the message length.
-            int blockSize = Mathf.CeilToInt(message.Length / 16f) * 16;
-            byte[] pass = Encoding.UTF8.GetBytes(message);
+            int blockSize = Mathf.CeilToInt(messageBytes.Length / 16f) * 16;
             EncryptedRequestBroadcast encryptedRequestBroadcast = new()
             {
-                EncryptedMessage = _crypto.EncryptData(pass),
-                EncryptedMessagePadCount = blockSize - pass.Length
+                EncryptedMessage = _crypto.EncryptData(messageBytes),
+                EncryptedMessagePadCount = blockSize - messageBytes.Length
             };
             networkManager.Log("Sending encrypted request to server...");
             networkManager.ClientManager.Broadcast(encryptedRequestBroadcast);
-            _onResponseFromServer = onResponseFromServer;
         }
 
         private void OnEnable()

@@ -9,12 +9,10 @@ using FishNet.Connection;
 using FishNet.Managing;
 using FishNet.Transporting;
 using NetworkEncrypted.Crypto;
-using UnityEngine;
 
 namespace NetworkEncrypted
 {
-    [DisallowMultipleComponent]
-    public class EncryptedChannelServer : MonoBehaviour
+    public class EncryptedChannelServer
     {
         #region Public
 
@@ -46,68 +44,66 @@ namespace NetworkEncrypted
 
         #region Private
 
+        private bool _initialized;
+        private NetworkManager _networkManager;
         private readonly Dictionary<NetworkConnection, bool> _handshakeCompleted = new();
         private Action<NetworkConnection, bool> _handshakeCompletedDelegate;
         private Action<NetworkConnection, string> _encryptedRequestFromClientDelegate;
         private Encryptor _crypto;
 
         #endregion
-
+        
+        /// <summary>
+        /// You need to InitializeChannel() before you are able to receive encrypted messages from clients.
+        /// </summary>
+        public void InitializeChannel(NetworkManager networkManager)
+        {
+            _crypto = new Encryptor(EncryptorP, EncryptorG);
+            _networkManager = networkManager;
+            //Listen for handshake broadcast from client.
+            _networkManager.ServerManager.RegisterBroadcast<HandshakeRequestBroadcast>(
+                OnHandshakeRequestBroadcast,
+                false
+            );
+            _networkManager.Log("Listening for Handshake request...");
+            //Listen for EncryptedRequestBroadcast from client.
+            _networkManager.ServerManager.RegisterBroadcast<EncryptedRequestBroadcast>(
+                OnEncryptedRequestBroadcast,
+                false
+            );
+            _networkManager.Log("Listening for encrypted requests...");
+            _initialized = true;
+        }
+        
         /// <summary>
         /// Use this to send a response to a recently received encrypted message.
         /// </summary>
         public void SendResponseToAnEncryptedMessage(NetworkConnection conn, string responseString)
         {
-            NetworkManager networkManager = InstanceFinder.NetworkManager;
-            networkManager.Log("Sending response to an encrypted request from the client...");
+            if (!_initialized) return;
+            _networkManager.Log("Sending response to an encrypted request from the client...");
             ResponseToEncryptedMsgBroadcast responseToEncryptedMsgBroadcast = new()
             {
                 Response = responseString
             };
-            networkManager.ServerManager.Broadcast(conn, responseToEncryptedMsgBroadcast, false);
+            _networkManager.ServerManager.Broadcast(conn, responseToEncryptedMsgBroadcast, false);
         }
-
-        private void OnEnable()
+        
+        /// <summary>
+        /// If you want to stop listening to clients or destroy this object, don't forget to CloseChannel().
+        /// </summary>
+        public void CloseChannel()
         {
-            InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState += OnServerConnectionState;
-        }
-
-        private void OnDisable()
-        {
-            InstanceFinder.NetworkManager.ServerManager.OnServerConnectionState -= OnServerConnectionState;
-        }
-
-        private void OnServerConnectionState(ServerConnectionStateArgs serverArgs)
-        {
+            _initialized = false;
             NetworkManager networkManager = InstanceFinder.NetworkManager;
-            switch (serverArgs.ConnectionState)
-            {
-                case LocalConnectionState.Started:
-                    _crypto = new Encryptor(EncryptorP, EncryptorG);
-                    //Listen for handshake broadcast from client.
-                    networkManager.ServerManager.RegisterBroadcast<HandshakeRequestBroadcast>(
-                        OnHandshakeRequestBroadcast,
-                        false
-                    );
-                    networkManager.Log("Listening for Handshake request...");
-                    //Listen for EncryptedRequestBroadcast from client.
-                    networkManager.ServerManager.RegisterBroadcast<EncryptedRequestBroadcast>(
-                        OnEncryptedRequestBroadcast,
-                        false
-                    );
-                    networkManager.Log("Listening for encrypted requests...");
-                    break;
-                case LocalConnectionState.Stopped:
-                    networkManager.ServerManager.UnregisterBroadcast<HandshakeRequestBroadcast>(
-                        OnHandshakeRequestBroadcast
-                    );
-                    networkManager.Log("Stopped Listening for Handshake request...");
-                    networkManager.ServerManager.UnregisterBroadcast<EncryptedRequestBroadcast>(
-                        OnEncryptedRequestBroadcast
-                    );
-                    networkManager.Log("Stopped Listening for encrypted requests...");
-                    break;
-            }
+            networkManager.ServerManager.UnregisterBroadcast<HandshakeRequestBroadcast>(
+                OnHandshakeRequestBroadcast
+            );
+            networkManager.Log("Stopped Listening for Handshake request...");
+            networkManager.ServerManager.UnregisterBroadcast<EncryptedRequestBroadcast>(
+                OnEncryptedRequestBroadcast
+            );
+            networkManager.Log("Stopped Listening for encrypted requests...");
         }
 
         /// <summary>
@@ -120,20 +116,19 @@ namespace NetworkEncrypted
         /// 
         private void OnHandshakeRequestBroadcast(NetworkConnection conn, HandshakeRequestBroadcast hsk, Channel channel)
         {
-            NetworkManager networkManager = InstanceFinder.NetworkManager;
-            networkManager.Log("Received Handshake request from client...");
+            _networkManager.Log("Received Handshake request from client...");
             Span<byte> result = stackalloc byte[64 + 16];
             byte[] data = new byte[64 + 16];
             result.Clear();
             //Compute the common private key based on the public key received.
-            networkManager.Log("Computing the SharedKey key based on the public key received from client...");
+            _networkManager.Log("Computing the SharedKey key based on the public key received from client...");
             _crypto.ComputeShared(Transforms.InvertTransformValueArray(hsk.PublicKey).ToArray());
             //Mark the handshake as completed for this client.
             _handshakeCompleted.Add(conn, true);
             /* Send a HandshakeResponse broadcast message to client with the server
              * public key so the client can also compute the common private key
              * and use it for encrypted communication with the server.*/
-            networkManager.Log("Sending Server Public Key as a response to the handshake request from client...");
+            _networkManager.Log("Sending Server Public Key as a response to the handshake request from client...");
             Array.ConstrainedCopy(_crypto.GetRandomSalt(), 0, data, 0, 64);
             Array.ConstrainedCopy(_crypto.GetIV(), 0, data, 64, 16);
             result = new Span<byte>(data);
@@ -153,12 +148,11 @@ namespace NetworkEncrypted
         /// <param name="erb">The encrypted data the client has sent.</param>
         private void OnEncryptedRequestBroadcast(NetworkConnection conn, EncryptedRequestBroadcast erb, Channel channel)
         {
-            NetworkManager networkManager = InstanceFinder.NetworkManager;
             // We can't receive encrypted messages if the client and server haven't agreed
             // on a SharedKey key for the encryption of the transmitted data.
-            if (!_handshakeCompleted[conn])
+            if (!_handshakeCompleted.GetValueOrDefault(conn))
             {
-                networkManager.LogWarning("A Client tried to send an encryptedMessage without completing handshaking.");
+                _networkManager.LogWarning("A Client tried to send an encryptedMessage without completing handshaking.");
                 return;
             }
 
@@ -176,7 +170,7 @@ namespace NetworkEncrypted
         /// </summary>
         private void SendHandshakeResponse(NetworkConnection conn, HandshakeResponseBroadcast hrb)
         {
-            InstanceFinder.NetworkManager.ServerManager.Broadcast(conn, hrb, false);
+            _networkManager.ServerManager.Broadcast(conn, hrb, false);
         }
     }
 }
