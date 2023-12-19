@@ -19,41 +19,39 @@ namespace NetworkAuth.Crypto
         private int p, g;
         //The Encryption block size(in bytes)
         internal static readonly byte blocksize = 16;
-
-#if !NETWORKTYPES_DEBUG
+		
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public Encryptor()
         {
             crypto = Aes.Create();
             crypto.KeySize = 128;
-            crypto.BlockSize = 128;
             crypto.GenerateIV();
             IV = crypto.IV;
             keygen = new KeyGenerator();
             g = keygen.G;
             p = keygen.P;
         }
-#if !NETWORKTYPES_DEBUG
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public Encryptor(int P, int G)
         {
             crypto = new AesCryptoServiceProvider();
+            crypto.KeySize = 128;
+            crypto.GenerateIV();
+            IV = crypto.IV;
             keygen = new KeyGenerator(P, G);
+            g = keygen.G;
+            p = keygen.P;
         }
 
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         //The P component of the key
         internal int GetP()
         {
             return p;
         }
-#if !NETWORKTYPES_DEBUG
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         //The G component of the key
         internal int GetG()
         {
@@ -81,9 +79,7 @@ namespace NetworkAuth.Crypto
                 IV = value;
             }
         }
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         //Gets the IV for the current AES instance.
         internal byte[] GetIV()
         {
@@ -91,17 +87,13 @@ namespace NetworkAuth.Crypto
             Debug.Assert(IV != null);
             return IV;
         }
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         //Gets the SharedKey key that the server-client agreed to.
         public byte[] GetSharedKey()
         {
             return SharedKey;
         }
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         internal byte[] GetRandomSalt()
         {
             if (RandomBytes == null)
@@ -125,14 +117,12 @@ namespace NetworkAuth.Crypto
             Debug.Assert(SharedKey != null);
             crypto.Key = SharedKey;
         }
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
-        internal byte[] EncryptData(byte[] data)
+        internal byte[] EncryptData(byte[] msgdata)
         {
             MemoryStream CipherMs;
             byte[] encrypteddata;
-            if (data.Length < blocksize)
+            if (msgdata.Length < blocksize)
             {
                 CipherMs = new MemoryStream(blocksize);
             }
@@ -140,14 +130,15 @@ namespace NetworkAuth.Crypto
             {
                 CipherMs = new();
             }
-            crypto.Padding = PaddingMode.PKCS7;
+            crypto.Mode = CipherMode.CBC;
+            crypto.Padding = PaddingMode.Zeros;
             ICryptoTransform encryptor = crypto.CreateEncryptor(SharedKey, IV);
             CryptoStream cs = new(CipherMs, encryptor, CryptoStreamMode.Write);
-            cs.Write(data, 0, data.Length);
+            cs.Write(msgdata, 0, msgdata.Length);
             cs.FlushFinalBlock();
             CipherMs.Flush();
             CipherMs.Position = 0;
-            if (data.Length > blocksize)
+            if (msgdata.Length > blocksize)
             {
                 encrypteddata = CipherMs.ToArray();
             }
@@ -161,20 +152,19 @@ namespace NetworkAuth.Crypto
             cs.Dispose();
             CipherMs = null;
             cs = null;
-            return encrypteddata;
+            return Transforms.TransformValueArray(encrypteddata).ToArray();
         }
 
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
-        internal byte[] DecryptData(byte[] data, int padlength)
+        internal byte[] DecryptData(byte[] msgdata, int msglength)
         {
-            byte[] decryptedData = new byte[(blocksize - padlength)];
-            crypto.Padding = PaddingMode.PKCS7;
-            MemoryStream DecryptMs = new MemoryStream(data);
+            byte[] decryptedData = new byte[msglength];
+            crypto.Mode = CipherMode.CBC;
+            crypto.Padding = PaddingMode.Zeros;
+            MemoryStream DecryptMs = new MemoryStream(Transforms.InvertTransformValueArray(msgdata).ToArray());
             ICryptoTransform decryptor = crypto.CreateDecryptor(SharedKey, IV);
             CryptoStream cs = new(DecryptMs, decryptor, CryptoStreamMode.Read);
-            cs.Read(decryptedData, 0, (blocksize - padlength));
+            cs.Read(decryptedData, 0, msglength);
             cs.Flush();
             cs.Clear();
             DecryptMs.Dispose();
@@ -184,9 +174,7 @@ namespace NetworkAuth.Crypto
             return decryptedData;
         }
 
-#if !NETWORKTYPES_DEBUG
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         //Cleans the managed and unmanaged resources.
         public void Dispose(bool disposing)
         {
