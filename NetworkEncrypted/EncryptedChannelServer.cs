@@ -158,7 +158,7 @@ namespace NetworkEncrypted
 
             // We got an encrypted string, decrypt it.
             string decryptedString = Encoding.UTF8.GetString(
-                _crypto.DecryptData(erb.EncryptedMessage, erb.EncryptedMessagePadCount)
+                _crypto.DecryptData(erb.EncryptedMessage, erb.EncryptedMessageLength)
             );
 
             // Send it to encrypted request listeners

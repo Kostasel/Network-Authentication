@@ -21,7 +21,7 @@ namespace NetworkEncrypted
     public struct EncryptedRequestBroadcast : IBroadcast
     {
         public byte[] EncryptedMessage;
-        public int EncryptedMessagePadCount;
+        public int EncryptedMessageLength;
     }
     //Server -> Client
     //TODO should we make response encrypted as well and just name it "EncryptedResponseBroadcast"? 

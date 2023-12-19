@@ -40,7 +40,6 @@ namespace NetworkEncrypted
         private bool _handshakeCompleted;
         private Action<bool> _handshakeCompletedDelegate;
         private static Encryptor _crypto;
-        private Action<string> _onResponseFromServer;
 
         #endregion
 
@@ -57,12 +56,10 @@ namespace NetworkEncrypted
             }
 
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-            //16 = aes encryption block size, so we increase in 16 bytes increments based on the message length.
-            int blockSize = Mathf.CeilToInt(messageBytes.Length / 16f) * 16;
             EncryptedRequestBroadcast encryptedRequestBroadcast = new()
             {
                 EncryptedMessage = _crypto.EncryptData(messageBytes),
-                EncryptedMessagePadCount = blockSize - messageBytes.Length
+                EncryptedMessageLength = messageBytes.Length
             };
             networkManager.Log("Sending encrypted request to server...");
             networkManager.ClientManager.Broadcast(encryptedRequestBroadcast);
@@ -160,7 +157,7 @@ namespace NetworkEncrypted
         private void OnEncryptedMsgResponseBroadcast(ResponseToEncryptedMsgBroadcast response, Channel channel)
         {
             InstanceFinder.NetworkManager.Log("Received encrypted message response from server...");
-            _onResponseFromServer?.Invoke(response.Response);
+            OnResponseToEncryptedMessage?.Invoke(response.Response);
         }
     }
 }
