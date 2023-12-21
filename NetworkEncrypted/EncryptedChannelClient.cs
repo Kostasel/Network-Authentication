@@ -18,7 +18,8 @@ namespace NetworkEncrypted
         #region Public
 
         /// Subscribe, if you need to know when you can start sending encrypted messaged.
-        /// When false, show errors to the user, as it means that the encrypted channel setup failed.
+        /// When false, show an error to the user or try to reestablish connection,
+        /// as it means that the encrypted channel cannot be used to send messages.
         /// True - completed successfully, false - completed with an error.
         public event Action<bool> OnHandshakeCompleted
         {
@@ -112,6 +113,7 @@ namespace NetworkEncrypted
                     clientManager.UnregisterBroadcast<ResponseToEncryptedMsgBroadcast>(OnEncryptedMsgResponseBroadcast);
                     _crypto?.Dispose(true);
                     networkManager.Log("EncryptedChannelClient Stopped.");
+                    _handshakeCompletedDelegate?.Invoke(false);
                     break;
             }
         }
