@@ -22,43 +22,41 @@ namespace NetworkAuth
         private static readonly byte[] prime10 = new byte[213] { 129, 203, 13, 198, 96, 244, 199, 11, 159, 82, 103, 158, 192, 130, 11, 83, 121, 241, 51, 18, 184, 116, 64, 143, 167, 56, 18, 53, 126, 90, 65, 37, 59, 83, 7, 200, 64, 110, 123, 141, 177, 62, 44, 117, 248, 105, 63, 186, 169, 81, 86, 80, 197, 107, 55, 114, 53, 72, 101, 73, 252, 1, 244, 3, 84, 124, 165, 250, 123, 69, 147, 244, 228, 255, 31, 168, 147, 189, 162, 182, 71, 187, 19, 165, 110, 174, 106, 10, 13, 243, 15, 81, 45, 229, 76, 110, 60, 187, 27, 69, 147, 5, 44, 70, 175, 26, 59, 28, 170, 109, 33, 148, 191, 83, 60, 110, 135, 2, 213, 219, 15, 171, 183, 102, 62, 166, 192, 76, 167, 55, 84, 32, 53, 112, 187, 97, 145, 123, 155, 11, 55, 55, 205, 53, 22, 150, 114, 198, 207, 128, 175, 30, 200, 112, 185, 48, 99, 115, 224, 186, 243, 214, 24, 249, 177, 41, 1, 176, 71, 80, 254, 197, 249, 18, 43, 62, 50, 67, 115, 200, 239, 119, 24, 207, 114, 106, 185, 39, 155, 78, 63, 52, 153, 179, 249, 139, 2, 57, 52, 141, 212, 140, 12, 22, 117, 161, 199, 209, 23, 42, 23, 189, 26, };
         private static readonly byte[] prime11 = new byte[213] { 105, 157, 75, 249, 164, 198, 173, 190, 81, 220, 4, 173, 182, 99, 204, 205, 83, 46, 143, 80, 40, 125, 124, 201, 82, 23, 167, 167, 38, 145, 4, 237, 211, 181, 222, 144, 233, 11, 45, 81, 240, 9, 161, 104, 11, 86, 101, 230, 11, 253, 251, 115, 2, 165, 171, 204, 212, 245, 211, 116, 189, 5, 44, 241, 241, 225, 224, 63, 38, 254, 224, 224, 189, 62, 2, 228, 225, 66, 164, 130, 188, 37, 184, 18, 116, 231, 148, 228, 187, 217, 41, 123, 27, 57, 123, 29, 203, 188, 172, 120, 234, 253, 102, 249, 211, 64, 22, 252, 80, 49, 120, 218, 40, 202, 27, 163, 234, 25, 158, 152, 230, 74, 175, 146, 220, 251, 95, 235, 17, 28, 60, 125, 149, 82, 50, 200, 3, 208, 228, 128, 6, 175, 83, 183, 242, 9, 62, 0, 90, 82, 209, 51, 42, 2, 94, 71, 197, 82, 22, 121, 14, 248, 198, 93, 104, 165, 35, 71, 232, 39, 199, 127, 253, 181, 93, 83, 40, 205, 63, 220, 228, 172, 54, 184, 149, 9, 96, 160, 73, 252, 253, 1, 30, 242, 40, 132, 94, 191, 66, 1, 160, 241, 167, 105, 90, 248, 24, 143, 133, 178, 81, 115, 27, };
         private static readonly byte[] prime12 = new byte[213] { 1, 94, 7, 233, 202, 244, 199, 11, 159, 82, 103, 158, 192, 130, 11, 83, 121, 241, 51, 18, 184, 116, 64, 143, 167, 56, 18, 53, 126, 90, 65, 37, 59, 83, 7, 200, 64, 110, 123, 141, 177, 62, 44, 117, 248, 105, 63, 186, 169, 81, 86, 58, 205, 239, 140, 67, 208, 163, 204, 79, 224, 149, 59, 87, 217, 106, 22, 214, 234, 176, 155, 141, 42, 47, 255, 139, 246, 83, 28, 207, 209, 166, 101, 89, 59, 197, 73, 239, 114, 153, 136, 94, 185, 99, 157, 48, 125, 58, 232, 204, 31, 113, 149, 76, 155, 155, 132, 118, 72, 86, 121, 118, 150, 57, 103, 11, 74, 134, 28, 31, 158, 203, 174, 16, 220, 145, 142, 168, 171, 239, 235, 198, 47, 241, 224, 76, 227, 26, 177, 191, 17, 38, 34, 37, 51, 240, 193, 99, 231, 235, 24, 250, 63, 150, 146, 185, 143, 228, 4, 61, 70, 28, 196, 180, 20, 19, 169, 101, 93, 36, 253, 205, 92, 91, 139, 94, 240, 29, 34, 44, 18, 175, 50, 197, 159, 182, 152, 162, 144, 135, 142, 247, 249, 175, 181, 209, 32, 114, 155, 207, 121, 116, 148, 184, 34, 116, 150, 8, 81, 114, 167, 225, 27, };
-        private static readonly byte[] salt = new byte[256] { 184, 202, 180, 250, 138, 74, 124, 175, 64, 191, 108, 78, 221, 109, 163, 62, 67, 184, 202, 22, 42, 165, 116, 151, 53, 138, 109, 43, 150, 30, 105, 143, 161, 86, 251, 60, 149, 90, 120, 18, 40, 93, 137, 222, 160, 7, 39, 60, 29, 60, 222, 177, 73, 134, 247, 52, 184, 30, 66, 84, 12, 108, 144, 52, 124, 138, 241, 57, 235, 63, 214, 44, 65, 148, 179, 109, 242, 195, 101, 166, 2, 81, 80, 72, 121, 204, 175, 37, 181, 110, 195, 184, 71, 68, 167, 59, 61, 133, 51, 53, 76, 47, 62, 157, 59, 109, 99, 146, 166, 3, 177, 168, 15, 157, 15, 32, 162, 21, 165, 83, 46, 7, 255, 152, 76, 176, 170, 128, 212, 23, 243, 178, 179, 19, 29, 40, 202, 231, 148, 108, 144, 157, 229, 43, 173, 75, 219, 41, 37, 230, 177, 140, 43, 147, 58, 162, 169, 153, 78, 129, 29, 217, 209, 36, 173, 150, 99, 35, 251, 227, 62, 49, 116, 190, 179, 245, 223, 9, 17, 241, 58, 222, 138, 97, 246, 191, 6, 6, 212, 44, 164, 75, 184, 1, 87, 217, 160, 36, 85, 176, 38, 63, 227, 209, 179, 125, 132, 102, 96, 60, 31, 150, 183, 136, 11, 166, 27, 62, 212, 153, 158, 132, 129, 210, 113, 209, 201, 248, 25, 88, 126, 170, 242, 146, 190, 46, 143, 236, 128, 143, 176, 196, 237, 195, 191, 77, 94, 220, 140, 68, 254, 117, 169, 116, 18, 161 };
+        
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal CryptoTransforms()
         {
             selected = rnd.Next(6, 12);
             selectedX = rnd.Next(0, 5);
         }
-
-        internal byte[] GetKeygenSalt()
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal int GetRandomPrime()
         {
-            return salt;
+            return rnd.Next(6, 12);
         }
-
-        internal int GetRandomPrimeIndex()
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal int GetRandomPrimeX()
         {
-            return selected;
+            return rnd.Next(0, 5);
         }
-
-        internal void Randomize()
+        internal void RandomizePrimes()
         {
-            selected = rnd.Next(1, 12);
+            selected = rnd.Next(6, 12);
             selectedX = rnd.Next(0, 5);
         }
-
-        internal byte[] GetRandomPrime(int idx)
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal byte[] GetPrimeP(int idx)
         {
-            selected = idx;
-            return GetRandomPrime();
+            return InternalGetPrimeP(idx);
         }
-        internal byte[] GetRandomPrimeX(int idx)
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal byte[] GetPrimeX(int idx)
         {
-            selectedX = idx;
-            return GetRandomPrimeX();
+            return InternalGetPrimeX(idx);
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal byte[] GetRandomPrime()
+        private byte[] InternalGetPrimeP(int idx)
         {
             if (selected == 6)
             {
@@ -91,7 +89,7 @@ namespace NetworkAuth
             return null;
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal byte[] GetRandomPrimeX()
+        private byte[] InternalGetPrimeX(int idx)
         {
             if (selectedX == 0)
             {
