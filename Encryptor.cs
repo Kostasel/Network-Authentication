@@ -6,7 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
 
-namespace NetworkAuth.Crypto
+namespace NetworkEncrypted.Crypto
 {
     public sealed class Encryptor : IDisposable
     {

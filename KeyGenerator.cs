@@ -1,4 +1,4 @@
-//Custom implementation of Diffie–Hellman–Merkle key agreement algorithm.
+//Custom implementation of Diffieï¿½Hellmanï¿½Merkle key agreement algorithm.
 //Copyright 2023 Kostasel
 //See license.txt for license details
 
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Cryptography;
 
-namespace NetworkAuth.Crypto
+namespace NetworkEncrypted.Crypto
 {
     public sealed class KeyGenerator
     {

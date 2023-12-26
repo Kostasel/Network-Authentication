@@ -1,7 +1,7 @@
 ﻿//Copyright 2023 Kostasel
 //See license.txt for license details
 
-namespace NetworkAuth
+namespace NetworkEncrypted
 {
     internal sealed class CryptoTransforms
     {
