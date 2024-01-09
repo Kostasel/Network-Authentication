@@ -103,8 +103,8 @@ namespace NetworkAuth.Crypto
             }
             return RandomBytes;
         }
-        //A 128 bit(16 byte) symmetric key based on the SharedKey key computed.
-        public void ComputeShared(byte[] ReceivedKeyValue)
+        //A 128 bit(16 byte) symmetric key based on the Shared Key computed.
+        public void ComputeServerShared(byte[] ReceivedKeyValue)
         {
             SharedKey = keygen.ComputeShared(ReceivedKeyValue, GetRandomSalt()).ToArray();
             Debug.Assert(SharedKey != null);
