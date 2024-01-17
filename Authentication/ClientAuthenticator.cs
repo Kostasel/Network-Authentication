@@ -5,6 +5,7 @@ using FishNet;
 using FishNet.Authenticating;
 using FishNet.Connection;
 using FishNet.Transporting;
+using FishNet.Managing;
 using NetworkAuth.Crypto;
 using System;
 using System.Text;

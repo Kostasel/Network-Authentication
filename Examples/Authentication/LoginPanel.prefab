@@ -626,7 +626,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1111796970465499709}
+      - m_Target: {fileID: 3250201614517982883}
         m_TargetAssemblyTypeName: NetworkAuth.ClientAuth.ClientAuthenticator, NetworkEncryption
         m_MethodName: AuthenticateClient
         m_Mode: 1
@@ -1036,9 +1036,9 @@ GameObject:
   - component: {fileID: 4338837536749246456}
   - component: {fileID: 4338837536749246459}
   - component: {fileID: 4338837536749246458}
-  - component: {fileID: 1111796970465499709}
+  - component: {fileID: 3250201614517982883}
   m_Layer: 5
-  m_Name: LoginCanvas
+  m_Name: LoginPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1132,7 +1132,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1111796970465499709
+--- !u!114 &3250201614517982883
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1141,7 +1141,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4338837536749245957}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fd32db61c4d0124286e6aa1a7031fa1, type: 3}
+  m_Script: {fileID: 11500000, guid: 83f7ef2fe0f5dc142989418638b97bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   username: {fileID: 4338837536066655648}
