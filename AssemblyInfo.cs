@@ -9,5 +9,5 @@
 [assembly: System.Reflection.AssemblyDescription("NetworkAuth: An Authentication and Data scrambling library for FishNet networking solution.")]
 
 // Version information.
-[assembly: System.Reflection.AssemblyVersion("1.0.2")]
-[assembly: System.Reflection.AssemblyFileVersion("1.0.2")]
+[assembly: System.Reflection.AssemblyVersion("1.0.2.1")]
+[assembly: System.Reflection.AssemblyFileVersion("1.0.2.1")]
