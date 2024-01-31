@@ -75,7 +75,11 @@ namespace NetworkEncrypted
         private void OnDisable()
         {
             // Stop listening if this behavior is disabled by the user.
-            InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionState;
+            ClientManager clientManager = InstanceFinder.ClientManager;
+            if (clientManager != null)
+            {
+                clientManager.OnClientConnectionState -= OnClientConnectionState;
+            }
         }
 
         /// <summary>
