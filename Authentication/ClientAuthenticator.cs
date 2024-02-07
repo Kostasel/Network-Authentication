@@ -49,7 +49,8 @@ namespace NetworkAuth.ClientAuth
 		
         private void OnDisable()
         {
-            //Stop listening for connection state change if disabled.
+	    //Stop listening for connection state change if disabled.
+	    if (clientManager != null)
             InstanceFinder.ClientManager.OnClientConnectionState -= OnClientConnectionState;
         }
 
