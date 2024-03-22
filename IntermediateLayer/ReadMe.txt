@@ -5,8 +5,6 @@ It is a Performant & Lightweight that is used to Scramble the outgoing data and 
 Used together with the authentication system make them undecryptable while being online(transmited).
 It will make it harder for others that try to cheat by changing the packets send from server or client.
 
-Tested under 256 CCU Load and works correctly without affecting server/client performance.
-
 When you run the scene make sure the field in
 NetworkManager->TransportManager->IntermediateLayer
 is filled and says Fast Transform Layer.
