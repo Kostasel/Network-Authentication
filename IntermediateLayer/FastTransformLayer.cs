@@ -21,7 +21,7 @@ namespace NetworkAuth.scramble
 
             for (int i = 0; i < incoming.Length; i++)
             {
-                incoming[i] = (byte)(incoming[i] ^ Transforms.InvertByteTransform(ref incoming[i]));
+                incoming[i] = Transforms.InvertByteTransform(ref incoming[i]);
             }
             return incoming.ToArray();
         }
@@ -34,7 +34,7 @@ namespace NetworkAuth.scramble
 
             for (int i = 0; i < outgoing.Length; i++)
             {
-                outgoing[i] = (byte)(outgoing[i] ^ Transforms.TransformByte(ref outgoing[i]));
+                outgoing[i] = Transforms.TransformByte(ref outgoing[i]);
             }
             return outgoing.ToArray();
         }
