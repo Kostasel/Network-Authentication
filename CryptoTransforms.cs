@@ -6,7 +6,7 @@ namespace NetworkAuth
     internal sealed class CryptoTransforms
     {
         private readonly static System.Random rnd = new(System.DateTime.Now.Millisecond);
-        private int selected;
+        private int selectedP;
         private int selectedX;
 
         private static readonly byte[] prime0 = new byte[213] { 3, 67, 71, 33, 226, 102, 196, 11, 159, 18, 6, 102, 229, 39, 199, 98, 253, 41, 184, 110, 75, 180, 105, 114, 100, 130, 254, 248, 224, 130, 186, 127, 76, 140, 131, 199, 64, 110, 123, 141, 177, 62, 44, 117, 248, 105, 63, 186, 169, 81, 86, 80, 197, 235, 129, 45, 180, 79, 188, 176, 64, 171, 79, 89, 60, 13, 182, 161, 44, 36, 92, 167, 113, 113, 150, 119, 25, 70, 38, 221, 173, 121, 44, 171, 218, 3, 181, 173, 85, 237, 181, 236, 96, 69, 175, 57, 249, 137, 97, 182, 45, 125, 61, 53, 96, 81, 72, 229, 203, 77, 22, 245, 195, 184, 238, 88, 60, 58, 7, 216, 137, 28, 161, 101, 159, 112, 216, 161, 132, 117, 159, 97, 248, 60, 239, 105, 240, 229, 113, 29, 35, 207, 98, 191, 250, 66, 239, 126, 150, 30, 141, 141, 25, 201, 9, 1, 153, 167, 216, 231, 156, 130, 252, 6, 21, 229, 237, 8, 71, 142, 177, 181, 93, 86, 133, 146, 124, 179, 212, 209, 68, 147, 7, 125, 193, 92, 140, 125, 63, 214, 168, 115, 215, 252, 214, 212, 6, 209, 101, 180, 53, 244, 138, 212, 242, 23, 187, 155, 113, 245, 238, 68, 5, };
@@ -26,11 +26,11 @@ namespace NetworkAuth
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal CryptoTransforms()
         {
-            selected = rnd.Next(6, 12);
+            selectedP = rnd.Next(6, 12);
             selectedX = rnd.Next(0, 5);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal int GetRandomPrime()
+        internal int GetRandomPrimeP()
         {
             return rnd.Next(6, 12);
         }
@@ -39,9 +39,9 @@ namespace NetworkAuth
         {
             return rnd.Next(0, 5);
         }
-        internal void RandomizePrimes()
+        internal void RandomizeInitedPrimes()
         {
-            selected = rnd.Next(6, 12);
+            selectedP = rnd.Next(6, 12);
             selectedX = rnd.Next(0, 5);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -54,35 +54,45 @@ namespace NetworkAuth
         {
             return InternalGetPrimeX(idx);
         }
+        
+        internal byte[] GetInitedPrimeP() 
+        {
+            return InternalGetPrimeP(selectedP);
+        }
+
+        internal byte[] GetInitedPrimeX()
+        {
+            return InternalGetPrimeX(selectedX);
+        }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private byte[] InternalGetPrimeP(int idx)
         {
-            if (selected == 6)
+            if (idx == 6)
             {
                 return prime6;
             }
-            else if (selected == 7)
+            else if (idx == 7)
             {
                 return prime7;
             }
-            else if (selected == 8)
+            else if (idx == 8)
             {
                 return prime8;
             }
-            else if (selected == 9)
+            else if (idx == 9)
             {
                 return prime9;
             }
-            else if (selected == 10)
+            else if (idx == 10)
             {
                 return prime10;
             }
-            else if (selected == 11)
+            else if (idx == 11)
             {
                 return prime11;
             }
-            else if (selected == 12)
+            else if (idx == 12)
             {
                 return prime12;
             }
@@ -91,27 +101,27 @@ namespace NetworkAuth
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private byte[] InternalGetPrimeX(int idx)
         {
-            if (selectedX == 0)
+            if (idx == 0)
             {
                 return prime0;
             }
-            else if (selectedX == 1)
+            else if (idx == 1)
             {
                 return prime1;
             }
-            else if (selectedX == 2)
+            else if (idx == 2)
             {
                 return prime2;
             }
-            else if (selectedX == 3)
+            else if (idx == 3)
             {
                 return prime3;
             }
-            else if (selectedX == 4)
+            else if (idx == 4)
             {
                 return prime4;
             }
-            else if (selectedX == 5)
+            else if (idx == 5)
             {
                 return prime5;
             }
