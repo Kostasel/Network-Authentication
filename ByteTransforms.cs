@@ -30,19 +30,13 @@ namespace NetworkAuth
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static byte TransformByte(ref byte input)
         {
-            Span<byte> transforms = stackalloc byte[256];
+            ReadOnlySpan<byte> transforms = stackalloc byte[256];
             transforms = transform;
             return transforms[input];
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static byte TransformByte(byte input)
-        {
-            return TransformByte(ref input);
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static byte Transform(byte input)
         {
             return TransformByte(ref input);
         }
@@ -163,20 +157,11 @@ namespace NetworkAuth
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static byte InvertByteTransform(ref byte input)
         {
-            Span<byte> Invert = stackalloc byte[256];
+            ReadOnlySpan<byte> Invert = stackalloc byte[256];
             Invert = invert;
             return Invert[input];
         }
-
         
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal static byte InvertByteTransform(ref int input)
-        {
-            Span<byte> Invert = stackalloc byte[256];
-            Invert = invert;
-            return Invert[input];
-        }
-
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal static Span<byte> InvertTransformValueArray(int value)
         {
