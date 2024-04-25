@@ -1,4 +1,4 @@
-//Custom implementation of Diffie–Hellman–Merkle key agreement algorithm.
+//Custom implementation of Diffieâ€“Hellmanâ€“Merkle key agreement algorithm.
 //Copyright 2023 Kostasel
 //See license.txt for license details
 
@@ -12,7 +12,7 @@ namespace NetworkAuth.Crypto
     public sealed class KeyGenerator
     {
         private BigInteger _public, p, x;
-        private int g, _p, _g;
+        private int g;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public KeyGenerator()
@@ -22,8 +22,8 @@ namespace NetworkAuth.Crypto
             x = new BigInteger(data.GetRandomPrimeX());
             g = ComputePrimeRoot(p);
             _public = BigInteger.ModPow(g, x, p);
-            _p = data.GetRandomPrime();
-            _g = g;
+            //_p = data.GetRandomPrime();
+            //_g = g;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -37,7 +37,8 @@ namespace NetworkAuth.Crypto
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal KeyGenerator(int P, int G, int X)
+        [Obsolete("Use KeyGenerator(int P, int G")]
+        private KeyGenerator(int P, int G, int X)
         {
             CryptoTransforms data = new CryptoTransforms();
             p = new BigInteger(data.GetPrimeP(P));
@@ -46,11 +47,11 @@ namespace NetworkAuth.Crypto
             _public = BigInteger.ModPow(g, x, p);
         }
 
-        internal int P
+        internal BigInteger P
         {
             get
             {
-                return _p;
+                return p;
             }
         }
 
@@ -58,7 +59,7 @@ namespace NetworkAuth.Crypto
         {
             get
             {
-                return _g;
+                return g;
             }
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
