@@ -82,7 +82,7 @@ namespace NetworkAuth.Crypto
             int rounds, i;
             pkey = new(OtherPublic);
             basekey = BigInteger.ModPow(pkey, x, p);
-            rounds = (512 << 1);
+            rounds = (4096 << 1);
             for (i = (values.Length - 1); i >= 0; i--)
             {
                 values[i] = (byte) (basekey % (40 >> 2));
