@@ -1,5 +1,5 @@
 Network Authenticator(NetworkAuth)
-An Authentication and Data scrambling library for FishNet networking solution.
+An Authentication library for FishNet networking solution.
 
 Copyright (c) 2023 Kostasel
 All rights reserved.
