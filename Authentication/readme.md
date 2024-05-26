@@ -1,4 +1,4 @@
-#Authentication components
+Authentication components
 
 Client Authenticator
 
