@@ -23,7 +23,7 @@ namespace NetworkAuth.ServerAuth
         private NetworkManager manager = null;
         private Encryptor crypto = null;
         #endregion
-
+        
         #region Public.
         /// <summary>
         /// Called when authenticator has concluded a result for a connection. Boolean is true if authenticated successfully, false if failed.
@@ -48,7 +48,7 @@ namespace NetworkAuth.ServerAuth
         [SerializeField]
         private string _password;
         #endregion
-
+        
         public override void InitializeOnce(NetworkManager networkManager)
         {
             base.InitializeOnce(networkManager);
@@ -162,14 +162,36 @@ namespace NetworkAuth.ServerAuth
             //and decide whether to allow the user to login or not.
             //Fill _username and _password fields with your real data.
             NetworkManager.Log("<color=orange><Server>:Validating client details...</color>");
-            bool ValidUsername = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Username, arb.usrlen)) == _username);
-            bool ValidPassword = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Password, arb.passlen)) == _password);
-            bool result = false;
-            if (ValidUsername == true && ValidPassword == true) { result = true; }
+            if (AcquireAndValidateLoginDetails(_username,_password))
+            {
+                result = true;
+            }
+            else
+            {
+                result = false;
+            }
             SendAuthenticationResponse(conn, result);
             OnAuthenticationResult?.Invoke(conn, result);
         }
 
+
+        /// <summary>
+        /// Gets and validates user details.
+        /// </summary>
+        /// <param name="username">A username to validate</param>
+        /// <param name="password">A password to validate</param>
+        private bool AcquireAndValidateLoginDetails(string username,string password)
+        {
+            //TODO:Implement here your own way of reading the login detail's from the server.
+            //Here i use only 2 string variables in the class for the username and password(Login Details).
+            //see _username,_password
+            //It is expected that username and password be a string type.
+            bool ValidUsername = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Username, arb.usrlen)) == username);
+            bool ValidPassword = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Password, arb.passlen)) == password);
+            if (ValidUsername == true && ValidPassword == true) return true;
+            else return false;
+        }
+        
         /// <summary>
         /// Sends an authentication result to a connection.
         /// </summary>
