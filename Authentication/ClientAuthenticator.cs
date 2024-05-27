@@ -149,13 +149,33 @@ namespace NetworkAuth.ClientAuth
         }
 
         /// <summary>
-        /// Called when the user presses the login button on the scene.
+        /// Called when the user presses the login button in the scene
+	/// and sends an authentication request with the provided username and password.
         /// </summary>
         public void AuthenticateClient()
         {
             if (!HandshakeCompleted) { InstanceFinder.NetworkManager.LogError("<color=red><b><Client>:Handshaking failed. Cannot Authenticate.</b></color>"); return; }
             byte[] usrname = Encoding.UTF8.GetBytes(username.text);
             byte[] pass = Encoding.UTF8.GetBytes(password.text);
+            AuthenticationRequestBroadcast arb = new()
+            {
+                Username = crypto.EncryptData(usrname),
+                usrlen = (usrname.Length),
+                Password = crypto.EncryptData(pass),
+                passlen = (pass.Length)
+            };
+            InstanceFinder.NetworkManager.Log("<color=orange><Client>:Sending Authentication request...</color>");
+            InstanceFinder.NetworkManager.ClientManager.Broadcast(arb);
+        }
+
+        /// <summary>
+        /// Sends an Authentication request with the provided username and password.
+        /// </summary>
+        public void AuthenticateClient(string username,string password)
+        {
+            if (!HandshakeCompleted) { InstanceFinder.NetworkManager.LogError("<color=red><b><Client>:Handshaking failed. Cannot Authenticate.</b></color>"); return; }
+            byte[] usrname = Encoding.UTF8.GetBytes(username);
+            byte[] pass = Encoding.UTF8.GetBytes(password);
             AuthenticationRequestBroadcast arb = new()
             {
                 Username = crypto.EncryptData(usrname),
