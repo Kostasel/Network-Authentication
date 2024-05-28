@@ -12,18 +12,16 @@ namespace NetworkAuth.Crypto
     public sealed class KeyGenerator
     {
         private BigInteger _public, p, x;
-        private int g, _p, _g;
+        private int g, _g;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public KeyGenerator()
         {
             CryptoTransforms data = new CryptoTransforms();
-            p = new BigInteger(data.GetRandomPrime());
+            p = new BigInteger(data.GetRandomPrimeP());
             x = new BigInteger(data.GetRandomPrimeX());
             g = ComputePrimeRoot(p);
             _public = BigInteger.ModPow(g, x, p);
-            _p = data.GetRandomPrime();
-            _g = g;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -46,13 +44,7 @@ namespace NetworkAuth.Crypto
             _public = BigInteger.ModPow(g, x, p);
         }
 
-        internal int P
-        {
-            get
-            {
-                return _p;
-            }
-        }
+        private int p1;
 
         internal int G
         {
@@ -61,13 +53,16 @@ namespace NetworkAuth.Crypto
                 return _g;
             }
         }
+
+        internal int P { get => p1; set => p1 = value; }
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public BigInteger GetPublicKey()
         {
             return _public;
         }
         /// <summary>
-        /// A 128 bit(16 byte) symmetric key based on the SharedKey key computed.
+        /// A 256 bit(32 byte) symmetric key based on the SharedKey key computed.
         /// </summary>
         /// <param name="OtherPublic">The other public key to compute SharedKey with</param>
         /// <param name="RandomBytes">The random salt to use to generate the key</param>
@@ -78,7 +73,7 @@ namespace NetworkAuth.Crypto
             BigInteger pkey, basekey;
             Rfc2898DeriveBytes ComputeKey;
             Span<byte> values = stackalloc byte[(256 << 1)];
-            Span<byte> result = stackalloc byte[2 << 3];
+            Span<byte> result = stackalloc byte[2 << 4];
             int rounds, i;
             pkey = new(OtherPublic);
             basekey = BigInteger.ModPow(pkey, x, p);
@@ -88,9 +83,9 @@ namespace NetworkAuth.Crypto
                 values[i] = (byte) (basekey % (40 >> 2));
                 basekey /= (40 >> 2);
             }
-            ComputeKey = new Rfc2898DeriveBytes(values.ToArray(), RandomBytes.ToArray(), rounds, HashAlgorithmName.SHA256);
-            //Compute a 128 bit(16 bytes) key.
-            result = ComputeKey.GetBytes(2 << 3);
+            ComputeKey = new Rfc2898DeriveBytes(values.ToArray(), RandomBytes.ToArray(), rounds, HashAlgorithmName.SHA512);
+            //Compute a 256 bit(32 bytes) key.
+            result = ComputeKey.GetBytes(2 << 4);
             rounds = 1 ^ 1;
             ComputeKey.Reset();
             ComputeKey.Dispose();

@@ -30,12 +30,12 @@ namespace NetworkAuth
             selectedX = rnd.Next(0, 5);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal int GetRandomPrimeP()
+        internal int InternalGetRandomPrimeP()
         {
             return rnd.Next(6, 12);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal int GetRandomPrimeX()
+        private int InternalGetRandomPrimeX()
         {
             return rnd.Next(0, 5);
         }
@@ -49,12 +49,24 @@ namespace NetworkAuth
         {
             return InternalGetPrimeP(idx);
         }
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal byte[] GetRandomPrimeP()
+        {
+            return InternalGetPrimeP(InternalGetRandomPrimeP());
+        }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal byte[] GetPrimeX(int idx)
         {
             return InternalGetPrimeX(idx);
         }
-        
+
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal byte[] GetRandomPrimeX()
+        {
+            return InternalGetPrimeX(InternalGetRandomPrimeX());
+        }
+
         internal byte[] GetInitedPrimeP() 
         {
             return InternalGetPrimeP(selectedP);

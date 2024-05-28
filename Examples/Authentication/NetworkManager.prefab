@@ -23,6 +23,30 @@ PrefabInstance:
       propertyPath: _levelOfDetailDistances.Array.data[1]
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4393252309867130423, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_UseSpriteMesh
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252309867130423, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252310051871671, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_UseSpriteMesh
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252310051871671, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_PreserveAspect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252310584637085, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_PixelPerfect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4393252310584637085, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
+      propertyPath: m_VertexColorAlwaysGammaSpace
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7443408887813606049, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -74,7 +98,7 @@ PrefabInstance:
     - target: {fileID: 7443408887813606050, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
       propertyPath: _spawnablePrefabs
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 0164ac34ee59dc447881e19474c21fb3, type: 2}
     - target: {fileID: 7443408887813606051, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
       propertyPath: m_Name
       value: NetworkManager
@@ -86,7 +110,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7443408887813606051, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
   m_PrefabInstance: {fileID: 4502374796951510743}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1143848899490485300
+--- !u!114 &5009377057364416061
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,12 +119,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6428865342456124532}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c59b14d3cc2d22488fcf7724e87b5df, type: 3}
+  m_Script: {fileID: 11500000, guid: 60488a939db15fc44947186ce3f8151c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _username: HelloWorld
-  _password: HelloWorld
---- !u!114 &4960402316247080561
+--- !u!114 &2786411454179573783
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -109,6 +131,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 6428865342456124532}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0b4f1faa4561d34b920945d3d7d2491, type: 3}
+  m_Script: {fileID: 11500000, guid: b8ab7bff1b91d3844878928c3d0a9324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _username: Hello
+  _password: Hello

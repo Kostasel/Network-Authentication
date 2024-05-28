@@ -5,18 +5,18 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
+using Protect.KeyProtection;
 
 namespace NetworkAuth.Crypto
 {
     public sealed class Encryptor : IDisposable
     {
         private Aes crypto;
-        private byte[] SharedKey;
+        private byte[] ProtecedSharedKey;
         private byte[] RandomBytes;
         private byte[] IV;
         private bool disposedValue;
         private KeyGenerator keygen;
-        private int p, g;
         //The Encryption block size(in bytes)
         internal static readonly byte blocksize = 16;
 		
@@ -24,39 +24,22 @@ namespace NetworkAuth.Crypto
         public Encryptor()
         {
             crypto = Aes.Create();
-            crypto.KeySize = 128;
+            crypto.KeySize = 256;
             crypto.GenerateIV();
             IV = crypto.IV;
             keygen = new KeyGenerator();
-            g = keygen.G;
-            p = keygen.P;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public Encryptor(int P, int G)
         {
             crypto = new AesCryptoServiceProvider();
-            crypto.KeySize = 128;
+            crypto.KeySize = 256;
             crypto.GenerateIV();
             IV = crypto.IV;
             keygen = new KeyGenerator(P, G);
-            g = keygen.G;
-            p = keygen.P;
         }
 
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        //The P component of the key
-        internal int GetP()
-        {
-            return p;
-        }
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        //The G component of the key
-        internal int GetG()
-        {
-            return g;
-        }
         //The Public key that will be send
         //Client(PublicKey) -> Server and Server(PublicKey) -> Client
         //and used as the key material for the SharedKey secret.
@@ -68,17 +51,16 @@ namespace NetworkAuth.Crypto
                 return keygen.GetPublicKey().ToByteArray();
             }
         }
-
-        internal byte[] iv
+        
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        internal void SetIV(byte[] value)
         {
-            set
-            {
-                Debug.Assert(value.Length > 16 || value != null || value.Length < 16);
-                if (value == null || value.Length > 16 || value.Length < 16) return;
-                crypto.IV = value;
-                IV = value;
-            }
+            Debug.Assert(value.Length > 16 || value != null || value.Length < 16);
+            if (value == null || value.Length > 16 || value.Length < 16) return;
+            crypto.IV = value;
+            IV = value;
         }
+
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         //Gets the IV for the current AES instance.
         internal byte[] GetIV()
@@ -88,10 +70,10 @@ namespace NetworkAuth.Crypto
             return IV;
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        //Gets the SharedKey key that the server-client agreed to.
+        //Gets the SharedSecret(Shared Key) that the server-client agreed to.
         public byte[] GetSharedKey()
         {
-            return SharedKey;
+            return KeyProtector.Unprotect(ProtecedSharedKey, crypto.IV);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal byte[] GetRandomSalt()
@@ -103,19 +85,25 @@ namespace NetworkAuth.Crypto
             }
             return RandomBytes;
         }
-        //A 128 bit(16 byte) symmetric key based on the Shared Key computed.
+        //A 256 bit(32 byte) symmetric key based on the Shared Key computed.
         public void ComputeServerShared(byte[] ReceivedKeyValue)
         {
-            SharedKey = keygen.ComputeShared(ReceivedKeyValue, GetRandomSalt()).ToArray();
-            Debug.Assert(SharedKey != null);
-            crypto.Key = SharedKey;
+            byte[] sharedkey = keygen.ComputeShared(ReceivedKeyValue, GetRandomSalt()).ToArray();
+            Debug.Assert(sharedkey != null);
+            ProtecedSharedKey = KeyProtector.Protect(sharedkey,crypto.IV);
+            Debug.Assert(ProtecedSharedKey != null);
+            crypto.Key = sharedkey;
+            Array.Clear(sharedkey, 0, sharedkey.Length);
         }
-        //A 128 bit(16 byte) symmetric key based on the SharedKey key computed.
-        public void ComputeSharedKey(byte[] ReceivedKeyValue, byte[] rndbytes)
+        //A 256 bit(32 byte) symmetric key based on the SharedKey key computed.
+        public void ComputeClientSharedKey(byte[] ReceivedKeyValue, byte[] rndbytes)
         {
-            SharedKey = keygen.ComputeShared(ReceivedKeyValue, rndbytes).ToArray();
-            Debug.Assert(SharedKey != null);
-            crypto.Key = SharedKey;
+            byte[] sharedkey = keygen.ComputeShared(ReceivedKeyValue, rndbytes).ToArray();
+            Debug.Assert(sharedkey != null);
+            ProtecedSharedKey = KeyProtector.Protect(sharedkey, crypto.IV);
+            Debug.Assert(ProtecedSharedKey != null);
+            crypto.Key = sharedkey;
+            Array.Clear(sharedkey, 0, sharedkey.Length);
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal byte[] EncryptData(byte[] msgdata)
@@ -132,7 +120,7 @@ namespace NetworkAuth.Crypto
             }
             crypto.Mode = CipherMode.CBC;
             crypto.Padding = PaddingMode.Zeros;
-            ICryptoTransform encryptor = crypto.CreateEncryptor(SharedKey, IV);
+            ICryptoTransform encryptor = crypto.CreateEncryptor(GetSharedKey(), crypto.IV);
             CryptoStream cs = new(CipherMs, encryptor, CryptoStreamMode.Write);
             cs.Write(msgdata, 0, msgdata.Length);
             cs.FlushFinalBlock();
@@ -162,7 +150,7 @@ namespace NetworkAuth.Crypto
             crypto.Mode = CipherMode.CBC;
             crypto.Padding = PaddingMode.Zeros;
             MemoryStream DecryptMs = new MemoryStream(Transforms.InvertTransformValueArray(msgdata).ToArray());
-            ICryptoTransform decryptor = crypto.CreateDecryptor(SharedKey, IV);
+            ICryptoTransform decryptor = crypto.CreateDecryptor(GetSharedKey(), crypto.IV);
             CryptoStream cs = new(DecryptMs, decryptor, CryptoStreamMode.Read);
             cs.Read(decryptedData, 0, msglength);
             cs.Flush();
@@ -184,7 +172,7 @@ namespace NetworkAuth.Crypto
                 {
                     if (crypto != null)
                     {
-                        Array.Clear(SharedKey, 0, SharedKey.Length);
+                        Array.Clear(ProtecedSharedKey, 0, ProtecedSharedKey.Length);
                         crypto.Clear();
                         crypto.Dispose();
                         crypto = null;

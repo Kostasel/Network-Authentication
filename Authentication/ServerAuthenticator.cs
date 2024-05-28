@@ -68,8 +68,14 @@ namespace NetworkAuth.ServerAuth
             if (serverargs.ConnectionState == LocalConnectionState.Started)
             {
                 //Using static parameters for P and G of Diffie-Hellman algoritm.
-                //cause they are strong enough and if changed need to be the same as the client.
+                //You can also use Encryptor constructor without parameters in order to get random
+                //parameters for P and G but you need to send G to client first before handshake
+                //can continue.
+                //cause they are strong enough and if changed needs to be the same as the client.
+                //Note: Only G represents a number that is given to encryptor class.
+                //      P represents and index to an array in CryptoDataTransforms class.
                 //See CryptoDataTransforms.cs for some P parameters you can choose.
+
                 crypto = new Encryptor(12, 6);
                 //Listen for handshake broadcast from client.
                 manager.ServerManager.RegisterBroadcast<HandshakeRequestBroadcast>(OnHandshakeRequestBroadcast, false);
@@ -93,20 +99,19 @@ namespace NetworkAuth.ServerAuth
         /// </summary>
         /// <see href="https://en.wikipedia.org/wiki/Diffie-Hellman_key_exchange"/>
         /// <param name="conn">Connection sending broadcast.</param>
-        /// <param name="hsk">The Public key of the client in order to compute a common key.</param>
-        /// 
-        private void OnHandshakeRequestBroadcast(NetworkConnection conn, HandshakeRequestBroadcast hsk, Channel channel)
+        /// <param name="handshakeRequestData">The broadcast that contains the public key of the client in order to compute a shared key.</param>
+        ///
+        private void OnHandshakeRequestBroadcast(NetworkConnection conn, HandshakeRequestBroadcast handshakeRequestData, Channel channel)
         {
             NetworkManager.Log("<color=orange><Server>:Received handshake request...</color>");
-            Span<byte> result;
-            byte[] data = new byte[64 + 16];
-            //Compute the common private key based on the public key received.
+            byte[] result = new byte[64 + 16];
+            //Compute the shared secret(shared key)based on the public key received.
             NetworkManager.Log("<color=orange><Server>:Computing the Shared Key based on the public key received...</color>");
-            crypto.ComputeServerShared(Transforms.InvertTransformValueArray(hsk.PublicKey).ToArray());
+            crypto.ComputeServerShared(Transforms.InvertTransformValueArray(handshakeRequestData.PublicKey).ToArray());
             if (crypto.PublicKey.Length > 0 && crypto.GetSharedKey().Length > 0)
             {
                 //The handshake is successfull.
-            HandshakeCompleted = true;
+                HandshakeCompleted = true;
                 NetworkManager.Log("<color=orange><Server>:Handshake Successfull.</color>");
             }
             else
@@ -121,96 +126,93 @@ namespace NetworkAuth.ServerAuth
              * public key so the client can also compute the common private key
              * and use it for encrypted communication with the server.*/
             NetworkManager.Log("<color=orange><Server>:Sending Server Public Key as a response to a handshake request...</color>");
-            Array.ConstrainedCopy(crypto.GetRandomSalt(), 0, data, 0, 64);
-            Array.ConstrainedCopy(crypto.GetIV(), 0, data, 64, 16);
-            result = new Span<byte>(data);
-            HandshakeResponseBroadcast hrb = new()
+            Buffer.BlockCopy(crypto.GetRandomSalt(), 0, result, 0, 64);
+            Buffer.BlockCopy(crypto.GetIV(), 0, result, 64, 16);
+            
+            HandshakeResponseBroadcast handshakeResponseData = new()
             {
                 PublicKey = Transforms.TransformValueArray(crypto.PublicKey).ToArray(),
-                Randombytes = Transforms.TransformValueArray(result.ToArray()).ToArray()
+                Randombytes = Transforms.TransformValueArray(result).ToArray()
             };
-            SendHandshakeResponse(conn, hrb);
-            Array.Clear(data,0, data.Length);
+            SendHandshakeResponse(conn, handshakeResponseData);
         }
 
         /// <summary>
         /// Received on server when a client sends the AuthenticationRequest broadcast message.
         /// </summary>
         /// <param name="conn">Connection sending broadcast.</param>
-        /// <param name="arb">The client login details for authentication.</param>
-        private void OnAuthenticationRequestBroadcast(NetworkConnection conn, AuthenticationRequestBroadcast arb, Channel channel)
+        /// <param name="ClientLoginData">The client login details for authentication.</param>
+        private void OnAuthenticationRequestBroadcast(NetworkConnection conn, AuthenticationRequestBroadcast ClientLoginData, Channel channel)
         {
+            bool authenticationResult;
+
             //We can't begin an authentication session if the client and server haven't agreed
-            //on a SharedKey key for the encryption of the transmited data.
+            //on a SharedKey key.
             if (!HandshakeCompleted)
             {
                 conn.Disconnect(true);
-                NetworkManager.LogWarning("<color=yellow><b><Server>:A Client tried to authenticate without previously completing handshaking.</b></color>");
+                NetworkManager.LogWarning("<color=yellow><b><Server>:A Client tried to authenticate without completing handshaking.</b></color>");
                 return;
             }
 
             /* If client is already authenticated this could be an attack. Connections
              * are removed when a client disconnects so there is no reason they should
              * already be considered authenticated. */
-            if (conn.Authenticated)
+            if (conn.IsAuthenticated)
             {
                 conn.Disconnect(true);
                 NetworkManager.LogWarning("<color=yellow><b><Server>:Client Disconnected. Reason: Already Authenticated.<b></color>");
                 return;
             }
-            //Check Here the actual user details from your database,playfab, etc.
-            //and decide whether to allow the user to login or not.
-            //Fill _username and _password fields with your real data.
+
             NetworkManager.Log("<color=orange><Server>:Validating client details...</color>");
-            if (AcquireAndValidateLoginDetails(_username,_password))
+            if (AcquireAndValidateLoginDetails(ClientLoginData))
             {
-                result = true;
+                authenticationResult = true;
             }
             else
             {
-                result = false;
+                authenticationResult = false;
             }
-            SendAuthenticationResponse(conn, result);
-            OnAuthenticationResult?.Invoke(conn, result);
+            SendAuthenticationResponse(conn, authenticationResult);
+            OnAuthenticationResult?.Invoke(conn, authenticationResult);
         }
 
 
         /// <summary>
         /// Gets and validates user details.
         /// </summary>
-        /// <param name="username">A username to validate</param>
-        /// <param name="password">A password to validate</param>
-        private bool AcquireAndValidateLoginDetails(string username,string password)
+        private bool AcquireAndValidateLoginDetails(AuthenticationRequestBroadcast ClientAuthenticationData)
         {
-            //TODO:Implement here your own way of reading the login detail's from the server.
+            //TODO:Implement here your own way of reading the login detail's from a database,playfab,firebase.etc.
             //Here i use only 2 string variables in the class for the username and password(Login Details).
-            //see _username,_password
+            //see _username, _password fields.
             //It is expected that username and password be a string type.
-            bool ValidUsername = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Username, arb.usrlen)) == username);
-            bool ValidPassword = (Encoding.UTF8.GetString(crypto.DecryptData(arb.Password, arb.passlen)) == password);
-            if (ValidUsername == true && ValidPassword == true) return true;
+            bool IsValidUsername = (Encoding.UTF8.GetString(crypto.DecryptData(ClientAuthenticationData.Username, ClientAuthenticationData.usrlen)) == _username);
+            bool IsValidPassword = (Encoding.UTF8.GetString(crypto.DecryptData(ClientAuthenticationData.Password, ClientAuthenticationData.passlen)) == _password);
+            if (IsValidUsername == true && IsValidPassword == true) return true;
             else return false;
         }
-        
+
         /// <summary>
         /// Sends an authentication result to a connection.
         /// </summary>
-        private void SendAuthenticationResponse(NetworkConnection conn, bool _authenticated)
+        private void SendAuthenticationResponse(NetworkConnection conn, bool authentication_result)
         {
             NetworkManager.Log("<color=orange><Server>:Sending Authentication response...</color>");
-            AuthenticationResponseBroadcast arb = new()
+            AuthenticationResponseBroadcast authenticationResponseData = new()
             {
-                Authenticated = _authenticated
+                Authenticated = authentication_result
             };
-            NetworkManager.ServerManager.Broadcast(conn, arb, false);
+            NetworkManager.ServerManager.Broadcast(conn, authenticationResponseData, false);
         }
 
         /// <summary>
         /// Sends an Handshake response to a connection.
         /// </summary>
-        private void SendHandshakeResponse(NetworkConnection conn, HandshakeResponseBroadcast hrb)
+        private void SendHandshakeResponse(NetworkConnection conn, HandshakeResponseBroadcast ServerResponse)
         {
-            NetworkManager.ServerManager.Broadcast(conn, hrb, false);
+            NetworkManager.ServerManager.Broadcast(conn, ServerResponse, false);
         }
     }
 }

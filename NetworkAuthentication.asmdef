@@ -1,5 +1,5 @@
 {
-    "name": "NetworkEncryption",
+    "name": "NetworkAuth",
     "rootNamespace": "",
     "references": [
         "GUID:7c88a4a7926ee5145ad2dfa06f454c67"
@@ -10,7 +10,12 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "FISHNET",
+        "UNITY_2020_3_OR_NEWER",
+        "UNITY_STANDALONE_WIN",
+        "FISHNET_V4"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }

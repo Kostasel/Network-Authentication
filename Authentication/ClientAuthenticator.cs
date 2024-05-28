@@ -111,9 +111,9 @@ namespace NetworkAuth.ClientAuth
             Span<byte> iv = new Span<byte>(data, 64, 16);
             //Use the public key received to compute the SharedKey key.
             InstanceFinder.NetworkManager.Log("<color=orange><Client>:Computing the Shared Key based on the public key received from server...</color>");
-            crypto.ComputeSharedKey(Transforms.InvertTransformValueArray(hsk.PublicKey).ToArray(), rndbytes.ToArray());
             //Set the iv received from server(in the handshake broadcast) so the server/client can decrypt each other.
-            crypto.iv = iv.ToArray();
+            crypto.SetIV(iv.ToArray());
+            crypto.ComputeClientSharedKey(Transforms.InvertTransformValueArray(hsk.PublicKey).ToArray(), rndbytes.ToArray());
             if (crypto.PublicKey.Length > 0 && crypto.GetSharedKey().Length > 0)
             {
                 //The handshake is now completed.
@@ -131,11 +131,11 @@ namespace NetworkAuth.ClientAuth
         /// <summary>
         /// Received on client after server sends an authentication response.
         /// </summary>
-        /// <param name="arb"></param>
-        private void OnAuthenticationResponseBroadcast(AuthenticationResponseBroadcast arb, Channel channel)
+        /// <param name="AuthenticationResponseData">The Server Authentication Response</param>
+        private void OnAuthenticationResponseBroadcast(AuthenticationResponseBroadcast AuthenticationResponseData, Channel channel)
         {
             InstanceFinder.NetworkManager.Log("<color=orange><Client>:Received authentication response...</color>");
-            bool result = arb.Authenticated;
+            bool result = AuthenticationResponseData.Authenticated;
             if (result)
             {
                 InstanceFinder.NetworkManager.Log("<color=orange><Client>:Authenticated Successfully.</color>");
@@ -150,22 +150,22 @@ namespace NetworkAuth.ClientAuth
 
         /// <summary>
         /// Called when the user presses the login button in the scene
-	/// and sends an authentication request with the provided username and password.
+	    /// and sends an authentication request with the provided username and password.
         /// </summary>
         public void AuthenticateClient()
         {
             if (!HandshakeCompleted) { InstanceFinder.NetworkManager.LogError("<color=red><b><Client>:Handshaking failed. Cannot Authenticate.</b></color>"); return; }
             byte[] usrname = Encoding.UTF8.GetBytes(username.text);
             byte[] pass = Encoding.UTF8.GetBytes(password.text);
-            AuthenticationRequestBroadcast arb = new()
+            AuthenticationRequestBroadcast authenticationRequestData = new()
             {
                 Username = crypto.EncryptData(usrname),
-                usrlen = (usrname.Length),
+                usrlen = usrname.Length,
                 Password = crypto.EncryptData(pass),
-                passlen = (pass.Length)
+                passlen = pass.Length
             };
             InstanceFinder.NetworkManager.Log("<color=orange><Client>:Sending Authentication request...</color>");
-            InstanceFinder.NetworkManager.ClientManager.Broadcast(arb);
+            InstanceFinder.NetworkManager.ClientManager.Broadcast(authenticationRequestData);
         }
 
         /// <summary>
@@ -176,15 +176,15 @@ namespace NetworkAuth.ClientAuth
             if (!HandshakeCompleted) { InstanceFinder.NetworkManager.LogError("<color=red><b><Client>:Handshaking failed. Cannot Authenticate.</b></color>"); return; }
             byte[] usrname = Encoding.UTF8.GetBytes(username);
             byte[] pass = Encoding.UTF8.GetBytes(password);
-            AuthenticationRequestBroadcast arb = new()
+            AuthenticationRequestBroadcast authenticationRequestData = new()
             {
                 Username = crypto.EncryptData(usrname),
-                usrlen = (usrname.Length),
+                usrlen = usrname.Length,
                 Password = crypto.EncryptData(pass),
-                passlen = (pass.Length)
+                passlen = pass.Length
             };
             InstanceFinder.NetworkManager.Log("<color=orange><Client>:Sending Authentication request...</color>");
-            InstanceFinder.NetworkManager.ClientManager.Broadcast(arb);
+            InstanceFinder.NetworkManager.ClientManager.Broadcast(authenticationRequestData);
         }
     }
 }
