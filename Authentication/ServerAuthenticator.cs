@@ -67,13 +67,13 @@ namespace NetworkAuth.ServerAuth
         {
             if (serverargs.ConnectionState == LocalConnectionState.Started)
             {
-                //Using static parameters for P and G of Diffie-Hellman algoritm.
+                //Using static parameters for P and G of Diffie-Hellman algoritm,
+                //cause they are strong enough and if changed needs to be the same as the client.
                 //You can also use Encryptor constructor without parameters in order to get random
                 //parameters for P and G but you need to send G to client first before handshake
                 //can continue.
-                //cause they are strong enough and if changed needs to be the same as the client.
                 //Note: Only G represents a number that is given to encryptor class.
-                //      P represents and index to an array in CryptoDataTransforms class.
+                //      P represents an index to an array in CryptoDataTransforms class.
                 //See CryptoDataTransforms.cs for some P parameters you can choose.
 
                 crypto = new Encryptor(12, 6);
