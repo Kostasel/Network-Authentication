@@ -8,12 +8,10 @@ using FishNet.Managing;
 using FishNet.Managing.Client;
 using FishNet.Transporting;
 using NetworkEncrypted.Crypto;
-using UnityEngine;
 
 namespace NetworkEncrypted
 {
-    [DisallowMultipleComponent]
-    public class EncryptedChannelClient : MonoBehaviour
+    public class EncryptedChannelClient
     {
         #region Public
 
@@ -44,6 +42,24 @@ namespace NetworkEncrypted
 
         #endregion
 
+        public EncryptedChannelClient()
+        {
+            // Subscribe to connection state changes to know when to start establishing a secure channel.
+            ClientManager clientManager = InstanceFinder.ClientManager;
+            clientManager.OnClientConnectionState += OnClientConnectionState;
+
+            // If the connection has already started, we won't receive the event. Trigger it manually.
+            if (clientManager.Started)
+            {
+                OnClientConnectionState(
+                    new ClientConnectionStateArgs(
+                        LocalConnectionState.Started,
+                        InstanceFinder.NetworkManager.TransportManager.Transport.Index
+                    )
+                );
+            }
+        }
+
         /// <summary>
         /// Call this from the client, when you want to send a message securely.
         /// </summary>
@@ -64,22 +80,6 @@ namespace NetworkEncrypted
             };
             networkManager.Log("Sending encrypted request to server...");
             networkManager.ClientManager.Broadcast(encryptedRequestBroadcast);
-        }
-
-        private void OnEnable()
-        {
-            // Listen for connection state change as client.
-            InstanceFinder.ClientManager.OnClientConnectionState += OnClientConnectionState;
-        }
-
-        private void OnDisable()
-        {
-            // Stop listening if this behavior is disabled by the user.
-            ClientManager clientManager = InstanceFinder.ClientManager;
-            if (clientManager != null)
-            {
-                clientManager.OnClientConnectionState -= OnClientConnectionState;
-            }
         }
 
         /// <summary>
@@ -126,7 +126,6 @@ namespace NetworkEncrypted
         /// Received on client after server sends an Handshake response.
         /// <see cref="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange"/>
         /// </summary>
-        /// <param name="hsk"></param>
         private void OnHandshakeResponseBroadcast(HandshakeResponseBroadcast hsk, Channel channel)
         {
             NetworkManager networkManager = InstanceFinder.NetworkManager;
@@ -159,7 +158,6 @@ namespace NetworkEncrypted
         /// <summary>
         /// Received on client after server sends a response to previously sent encrypted message.
         /// </summary>
-        /// <param name="response"></param>
         private void OnEncryptedMsgResponseBroadcast(ResponseToEncryptedMsgBroadcast response, Channel channel)
         {
             InstanceFinder.NetworkManager.Log("Received encrypted message response from server...");
