@@ -1,4 +1,4 @@
-//Custom implementation of Diffie–Hellman–Merkle key agreement algorithm.
+//Custom implementation of Diffieâ€“Hellmanâ€“Merkle key agreement algorithm.
 //Copyright 2023 Kostasel
 //See license.txt for license details
 
@@ -12,7 +12,7 @@ namespace NetworkAuth.Crypto
     public sealed class KeyGenerator
     {
         private BigInteger _public, p, x;
-        private int g, _g;
+        private int g;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public KeyGenerator()
@@ -43,19 +43,7 @@ namespace NetworkAuth.Crypto
             g = G;
             _public = BigInteger.ModPow(g, x, p);
         }
-
-        private int p1;
-
-        internal int G
-        {
-            get
-            {
-                return _g;
-            }
-        }
-
-        internal int P { get => p1; set => p1 = value; }
-
+        
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public BigInteger GetPublicKey()
         {
