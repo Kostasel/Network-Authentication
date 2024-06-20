@@ -22,8 +22,6 @@ namespace NetworkEncrypted.Crypto
             x = new BigInteger(data.GetRandomPrimeX());
             g = ComputePrimeRoot(p);
             _public = BigInteger.ModPow(g, x, p);
-            _p = data.GetRandomPrime();
-            _g = g;
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
