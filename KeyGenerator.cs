@@ -13,7 +13,7 @@ namespace NetworkEncrypted.Crypto
     {
         private BigInteger _public, p, x;
         private int g;
-
+        
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public KeyGenerator()
         {
