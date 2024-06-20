@@ -12,7 +12,7 @@ namespace NetworkEncrypted.Crypto
     public sealed class KeyGenerator
     {
         private BigInteger _public, p, x;
-        private int g, _p, _g;
+        private int g;
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public KeyGenerator()
@@ -48,7 +48,7 @@ namespace NetworkEncrypted.Crypto
         {
             get
             {
-                return _p;
+                return p;
             }
         }
 
@@ -56,7 +56,7 @@ namespace NetworkEncrypted.Crypto
         {
             get
             {
-                return _g;
+                return g;
             }
         }
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
