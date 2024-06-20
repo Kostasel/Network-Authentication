@@ -35,7 +35,7 @@ namespace NetworkAuth.Crypto
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        internal KeyGenerator(int P, int G, int X)
+        private KeyGenerator(int P, int G, int X)
         {
             CryptoTransforms data = new CryptoTransforms();
             p = new BigInteger(data.GetPrimeP(P));
