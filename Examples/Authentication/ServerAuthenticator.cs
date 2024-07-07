@@ -2,10 +2,9 @@ using System;
 using FishNet.Authenticating;
 using FishNet.Connection;
 using FishNet.Managing;
-using NetworkEncrypted;
 using UnityEngine;
 
-namespace Network_Authentication.Examples.Authentication
+namespace NetworkEncrypted.Examples.Authentication
 {
     public class ServerAuthenticator : Authenticator
     {

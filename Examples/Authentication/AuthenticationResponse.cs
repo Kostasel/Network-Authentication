@@ -1,6 +1,6 @@
 using System;
 
-namespace Network_Authentication.Examples.Authentication
+namespace NetworkEncrypted.Examples.Authentication
 {
     // Sent from server to client
     [Serializable]

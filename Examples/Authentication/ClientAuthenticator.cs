@@ -1,11 +1,10 @@
 using FishNet;
-using NetworkEncrypted;
+using FishNet.Managing;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Network_Authentication.Examples.Authentication
+namespace NetworkEncrypted.Examples.Authentication
 {
-    [RequireComponent(typeof(EncryptedChannelClient))]
     public class ClientAuthenticator : MonoBehaviour
     {
         [SerializeField] private InputField usernameField;
@@ -17,9 +16,9 @@ namespace Network_Authentication.Examples.Authentication
         // We cannot start auth before the encrypted channel handshake is finished.
         private bool _canStartAuth;
 
-        private void Awake()
+        private void Start()
         {
-            _encryptedChannelClient = GetComponent<EncryptedChannelClient>();
+            _encryptedChannelClient = new EncryptedChannelClient();
             loginButton.onClick.AddListener(_AuthenticateClient);
             _encryptedChannelClient.OnHandshakeCompleted += _OnHandshakeCompleted;
         }
